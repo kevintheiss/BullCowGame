@@ -1,22 +1,27 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "BullCowCartridge.h"
+#include "HiddenWordList.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
     SetupGame(); // Set up game
 
-    PrintLine(TEXT("The hidden word is: %s."), *HiddenWord); // Debug line
+    PrintLine(TEXT("The number of possible words is: %i"), Words.Num());
+    //PrintLine(TEXT("The first 5 words are: \n"));
+    PrintLine(TEXT("The hidden word is: %s"), *HiddenWord); // Debug line
 
-    // Welcome the player
-    //PrintLine(TEXT("Welcome to the Bull Cow game!"));
-    //PrintLine(TEXT("Guess the %i letter word!"), HiddenWord.Len());
-    //PrintLine(TEXT("Type in your guess \nand press Enter to continue..."));
+    for(int32 Index = 0; Index < 10; Index++)
+    {
+        if(Words[Index].Len() >= 4 && Words[Index].Len() <= 8)
+        {
+            PrintLine(TEXT("%s"), *Words[Index]);
+        }
+    }
 }
 
 void UBullCowCartridge::OnInput(const FString& Input) // When the player hits enter
 {
-    //ClearScreen();
     // if the game is over, ClearScreen() and SetupGame()
     // else check PlayerGuess
     if(bGameOver)
@@ -35,6 +40,7 @@ void UBullCowCartridge::SetupGame()
     bGameOver = false;
     HiddenWord = TEXT("cake"); // Set the hidden word
     Lives = HiddenWord.Len();
+
     // Welcome the player
     // Prompt player for guess
     PrintLine(TEXT("Welcome to the Bull Cow game!"));
@@ -56,15 +62,15 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
     // Check right number of characters
     if(Guess.Len() != HiddenWord.Len())
     {
-        PrintLine(TEXT("The hidden word is %i letters long"), HiddenWord.Len());
-        PrintLine(TEXT("Sorry, try again \nYou have %i Lives left"), Lives);
+        PrintLine(TEXT("The hidden word is %i letters long."), HiddenWord.Len());
+        PrintLine(TEXT("Sorry, try again \nYou have %i Lives left."), Lives);
         return;
     }
 
     // Check if isogram
     if(!IsIsogram(Guess))
     {
-        PrintLine(TEXT("No repeating letters allowed, try again"));
+        PrintLine(TEXT("No repeating letters allowed, try again."));
         return;
     }
 
@@ -100,9 +106,15 @@ bool UBullCowCartridge::IsIsogram(FString Word) const
 {
     for(int32 Index = 0; Index < Word.Len(); Index++)
     {
-       // PrintLine(TEXT("HiddenWord: %c, "), HiddenWord[Index]);
-        PrintLine(TEXT("%c"), Word[Index]);
+        for(int32 Comparison = Index + 1; Comparison < Word.Len(); Comparison++)
+        {
+            if(Word[Index] == Word[Comparison])
+            {
+                return false;
+            }
+        }
     }
+
     return true;
 }
 
